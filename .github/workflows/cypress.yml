@@ -23,6 +23,7 @@ jobs:
         run: npm ci
 
       - name: Run Cypress tests
+        id: cypress
         run: npm run test:ci
 
       - name: Upload test results
@@ -31,6 +32,15 @@ jobs:
         with:
           name: cypress-reports
           path: cypress/reports
+
+      - name: Read test results
+        id: test-results
+        if: always()
+        run: |
+          TEST_RESULTS=$(cat cypress/reports/json/mochawesome.json)
+          echo "results<<EOF" >> $GITHUB_ENV
+          echo "$TEST_RESULTS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Send webhook notification
         if: always()

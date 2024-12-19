@@ -3,16 +3,18 @@ import { defineConfig } from 'cypress'
 export default defineConfig({
   reporter: 'cypress-mochawesome-reporter',
   reporterOptions: {
-    chart: false,
+    charts: true,
     reportPageTitle: 'Cypress Test Results',
-    embeddedScreenshots: false,
-    inlineAssets: false,
+    embeddedScreenshots: true,
+    inlineAssets: true,
     saveAllAttempts: false,
-    overwrite: false,
+    overwrite: true,
     saveJson: true,
-    html: false,
+    html: true,
     json: true,
     reportDir: 'cypress/reports',
+    reportFilename: 'mochawesome',
+    jsonDir: 'cypress/reports/json'
   },
   e2e: {
     // Configure your E2E tests here
