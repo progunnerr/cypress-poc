@@ -46,6 +46,5 @@ jobs:
         if: always()
         uses: distributhor/workflow-webhook@v3
         env:
-          webhook_url: ${{ secrets.WEBHOOK_URL }}
-          webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
-          data: '{"repository": "${{ github.repository }}", "workflow": "${{ github.workflow }}", "run_id": "${{ github.run_id }}", "status": "${{ job.status }}", "test_results": "${{ steps.cypress.outputs.results }}"}'
+          webhook_url: "https://webhook-test.com/e091dc6135eb410d139d87ba693bb01a"
+          data: '{"repository": "${{ github.repository }}", "workflow": "${{ github.workflow }}", "run_id": "${{ github.run_id }}", "status": "${{ job.status }}", "test_results": ${{ env.results }}}'
