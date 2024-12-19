@@ -36,18 +36,16 @@ jobs:
           name: cypress-reports
           path: cypress/reports
 
-      - name: Read test results
-        id: test-results
+      - name: Extract test summary
+        id: test-summary
         if: always()
         run: |
-          TEST_RESULTS=$(cat cypress/reports/mochawesome.json)
-          echo "results<<EOF" >> $GITHUB_ENV
-          echo "$TEST_RESULTS" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          SUMMARY=$(jq -c '{stats: .stats}' cypress/reports/mochawesome.json)
+          echo "summary=$SUMMARY" >> $GITHUB_ENV
 
       - name: Send webhook notification
         if: always()
         uses: distributhor/workflow-webhook@v3
         env:
           webhook_url: "https://webhook-test.com/e091dc6135eb410d139d87ba693bb01a"
-          data: '{"repository": "${{ github.repository }}", "workflow": "${{ github.workflow }}", "run_id": "${{ github.run_id }}", "status": "${{ job.status }}", "test_results": ${{ env.results }}}'
+          data: '{"repository": "${{ github.repository }}", "workflow": "${{ github.workflow }}", "run_id": "${{ github.run_id }}", "status": "${{ job.status }}", "summary": ${{ env.summary }}}'
