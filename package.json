@@ -11,6 +11,10 @@
   "devDependencies": {
     "cypress": "^13.17.0",
     "cypress-mochawesome-reporter": "^3.8.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "glob": "^10.3.10"
+  },
+  "overrides": {
+    "glob": "^10.3.10"
   }
 }
