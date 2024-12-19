@@ -40,7 +40,7 @@ jobs:
         id: test-results
         if: always()
         run: |
-          TEST_RESULTS=$(cat cypress/reports/json/mochawesome.json)
+          TEST_RESULTS=$(cat cypress/reports/mochawesome.json)
           echo "results<<EOF" >> $GITHUB_ENV
           echo "$TEST_RESULTS" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
