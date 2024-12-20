@@ -31,21 +31,27 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-reports
           path: cypress/reports
 
-      - name: Extract test summary
-        id: test-summary
+      - name: Prepare test results
+        id: prepare-results
         if: always()
         run: |
-          SUMMARY=$(jq -c '{stats: .stats}' cypress/reports/mochawesome.json)
-          echo "summary=$SUMMARY" >> $GITHUB_ENV
+          # Create a temporary file with the complete payload
+          echo '{
+            "repository": "${{ github.repository }}",
+            "workflow": "${{ github.workflow }}",
+            "run_id": "${{ github.run_id }}",
+            "status": "${{ job.status }}",
+            "test_results": '$(cat cypress/reports/mochawesome.json)'}' > webhook_payload.json
 
       - name: Send webhook notification
         if: always()
         uses: distributhor/workflow-webhook@v3
-        env:
+        with:
           webhook_url: "https://webhook-test.com/e091dc6135eb410d139d87ba693bb01a"
-          data: '{"repository": "${{ github.repository }}", "workflow": "${{ github.workflow }}", "run_id": "${{ github.run_id }}", "status": "${{ job.status }}", "summary": ${{ env.summary }}}'
+          webhook_type: json
+          data_file: webhook_payload.json
