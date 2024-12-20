@@ -48,10 +48,9 @@ jobs:
             "status": "${{ job.status }}",
             "test_results": '$(cat cypress/reports/mochawesome.json)'}' > webhook_payload.json
 
-      - name: Send webhook notification
-        if: always()
-        uses: distributhor/workflow-webhook@v3
-        with:
-          webhook_url: "https://webhook-test.com/e091dc6135eb410d139d87ba693bb01a"
-          webhook_type: json
-          data_file: webhook_payload.json
+      - name: Send webhook
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d @webhook_payload.json \
+            ${{ secrets.WEBHOOK_URL }}
