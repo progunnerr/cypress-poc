@@ -31,22 +31,31 @@ jobs:
           
           if [ -f "cypress/reports/mochawesome.json" ]; then
             echo "Found mochawesome.json file"
-            TEST_RESULTS=$(cat cypress/reports/mochawesome.json)
-            curl -X POST \
+          
+            # Validate JSON and create formatted payload
+            echo "Creating payload..."
+            jq -c \
+              --arg status "${{ job.status }}" \
+              --arg repo "${{ github.repository }}" \
+              '{status: $status, repo: $repo, testResults: .}' \
+              cypress/reports/mochawesome.json > payload.json
+          
+            echo "Payload size: $(wc -c < payload.json) bytes"
+            echo "First 1000 characters of payload:"
+            head -c 1000 payload.json
+          
+            echo "Sending payload..."
+            curl -v -X POST \
               -H "Content-Type: application/json" \
-              -d "{
-                \"status\": \"${{ github.event.workflow_run.conclusion }}\",
-                \"repo\": \"${{ github.repository }}\",
-                \"testResults\": ${TEST_RESULTS}
-              }" \
+              --data @payload.json \
               $WEBHOOK_URL
+          
+            echo "Cleaning up..."
+            rm payload.json
           else
+            echo "No mochawesome.json found, sending error notification"
             curl -X POST \
               -H "Content-Type: application/json" \
-              -d "{
-                \"status\": \"${{ github.event.workflow_run.conclusion }}\",
-                \"repo\": \"${{ github.repository }}\",
-                \"error\": \"No test results found\"
-              }" \
+              -d "{\"status\": \"${{ job.status }}\", \"repo\": \"${{ github.repository }}\", \"error\": \"No test results found\"}" \
               $WEBHOOK_URL
           fi
