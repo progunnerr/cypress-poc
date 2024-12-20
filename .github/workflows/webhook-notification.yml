@@ -26,7 +26,11 @@ jobs:
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         run: |
-          if [ -f "cypress/reports/json/mochawesome.json" ]; then
+          echo "Listing contents of cypress/reports directory:"
+          ls -R cypress/reports || echo "Reports directory not found"
+          
+          if [ -f "cypress/reports/mochawesome.json" ]; then
+            echo "Found mochawesome.json file"
             TEST_RESULTS=$(cat cypress/reports/json/mochawesome.json)
             curl -X POST \
               -H "Content-Type: application/json" \
