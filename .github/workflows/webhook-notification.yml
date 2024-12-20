@@ -10,14 +10,19 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
+      - name: Download artifacts
+        if: always()
+        uses: dawidd6/action-download-artifact@v3
+        continue-on-error: true
         with:
+          workflow: cypress.yml
           name: cypress-reports
-          run-id: ${{ github.event.workflow_run.id }}
           path: cypress/reports
+          workflow_conclusion: completed
+          run_id: ${{ github.event.workflow_run.id }}
           
       - name: Send notification
+        if: always()
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         run: |
