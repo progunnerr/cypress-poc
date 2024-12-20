@@ -1,0 +1,43 @@
+name: Webhook Notification
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Cypress Tests"]
+    types: [completed]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cypress-reports
+          run-id: ${{ github.event.workflow_run.id }}
+          path: cypress/reports
+          
+      - name: Send notification
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        run: |
+          if [ -f "cypress/reports/json/mochawesome.json" ]; then
+            TEST_RESULTS=$(cat cypress/reports/json/mochawesome.json)
+            curl -X POST \
+              -H "Content-Type: application/json" \
+              -d "{
+                \"status\": \"${{ github.event.workflow_run.conclusion }}\",
+                \"repo\": \"${{ github.repository }}\",
+                \"testResults\": ${TEST_RESULTS}
+              }" \
+              $WEBHOOK_URL
+          else
+            curl -X POST \
+              -H "Content-Type: application/json" \
+              -d "{
+                \"status\": \"${{ github.event.workflow_run.conclusion }}\",
+                \"repo\": \"${{ github.repository }}\",
+                \"error\": \"No test results found\"
+              }" \
+              $WEBHOOK_URL
+          fi
