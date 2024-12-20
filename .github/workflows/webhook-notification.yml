@@ -31,7 +31,7 @@ jobs:
           
           if [ -f "cypress/reports/mochawesome.json" ]; then
             echo "Found mochawesome.json file"
-            TEST_RESULTS=$(cat cypress/reports/json/mochawesome.json)
+            TEST_RESULTS=$(cat cypress/reports/mochawesome.json)
             curl -X POST \
               -H "Content-Type: application/json" \
               -d "{
